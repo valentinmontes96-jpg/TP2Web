@@ -1,7 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using MudBlazor.Services;
 using TP2Web.FrontEnd.Components;
 using TP2Web.FrontEnd.Data;
-using MudBlazor.Services;
+using TP2Web.FrontEnd.Implementaciones;
+using TP2Web.FrontEnd.Repositories;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +21,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         new MariaDbServerVersion(new Version(10, 10))
     ));
 
+builder.Services.AddScoped<IMascotaRepository, MascotaRepository>();
+
+////////////////////////
 
 var app = builder.Build();
 

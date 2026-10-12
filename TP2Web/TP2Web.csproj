@@ -9,10 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="FrontEnd\Services\" />
+    <Folder Include="FrontEnd\Utilities\" />
     <Folder Include="FrontEnd\Migrations\" />
-    <Folder Include="FrontEnd\DTO\" />
-    <Folder Include="FrontEnd\Repositories\" />
   </ItemGroup>
 
   <ItemGroup>
