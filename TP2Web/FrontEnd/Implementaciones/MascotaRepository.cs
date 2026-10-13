@@ -18,7 +18,7 @@ namespace TP2Web.FrontEnd.Implementaciones
             _context = context;
         }
 
-        public async Task<PaginadoResponse<Mascota>> ObtenerTodasAsync(MascotaQueryParametros parametros)
+        public async Task<PaginadoResponse<Mascota>> ObtenerTodasAsync(MascotaQueryParameters parametros)
         {
             //Iniciamos la consulta sin trackear para que sea más rápida
             IQueryable<Mascota> query = _context.Mascotas.AsNoTracking();
@@ -47,15 +47,30 @@ namespace TP2Web.FrontEnd.Implementaciones
                 .Take(parametros.TamanoPagina)
                 .ToListAsync();
 
-            return new PaginadoResponse<Mascota>(mascotas, parametros.PaginaActual, parametros.TamanoPagina, totalRegistros);
+            return new PaginadoResponse<Mascota>
+            {
+                Items = mascotas,
+                PaginaActual = parametros.PaginaActual,
+                TamanoPagina = parametros.TamanoPagina,
+                TotalRegistros = totalRegistros
+            };
 
         }
 
+        public void Eliminar(Mascota mascota)
+        {
+            _context.Mascotas.Remove(mascota);
+        }
         public async Task<Mascota?> ObtenerPorIdAsync(int id)
         {
             return await _context.Mascotas
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.Id == id);
+        }
+
+        public void Actualizar(Mascota mascota)
+        {
+            _context.Mascotas.Update(mascota);
         }
 
         public async Task AgregarAsync(Mascota mascota)
