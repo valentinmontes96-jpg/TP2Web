@@ -1,7 +1,81 @@
-﻿@page "/"
+﻿@page "/home"
+@rendermode InteractiveServer
+@attribute [Authorize] 
 
-<PageTitle>Home</PageTitle>
+@using Microsoft.AspNetCore.Components.Authorization
+@using TP2Web.FrontEnd.Providers
+@using System.Security.Claims
 
-<h1>Hello, world!</h1>
+@* Esta es la barrera mágica: si no hay token válido, rebota al login *@
 
-Welcome to your new app.
+
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Navigation
+
+<PageTitle>Inicio - Clínica Veterinaria</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-16">
+    <MudCard Elevation="4">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h4" Color="Color.Primary">Panel Principal</MudText>
+                <MudText Typo="Typo.subtitle1">Sistema de Gestión Veterinaria</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudAlert Severity="Severity.Success" Class="mb-4">
+                Has iniciado sesión correctamente y tu token JWT está activo.
+            </MudAlert>
+
+            <MudText Typo="Typo.h6" Class="mt-4 mb-2">Tus datos de sesión:</MudText>
+            
+            <MudPaper Class="pa-4" Outlined="true">
+                <MudList T="string" ReadOnly="true">
+                    <MudListItem Icon="@Icons.Material.Filled.Email">
+                        <strong>Email:</strong> @correoUsuario
+                    </MudListItem>
+                    <MudListItem Icon="@Icons.Material.Filled.Badge">
+                        <strong>Rol:</strong> @rolUsuario
+                    </MudListItem>
+                </MudList>
+            </MudPaper>
+
+        </MudCardContent>
+        <MudCardActions Class="pa-4 d-flex justify-end">
+            <MudButton Variant="Variant.Outlined" Color="Color.Error" StartIcon="@Icons.Material.Filled.Logout" OnClick="CerrarSesion">
+                Cerrar Sesión
+            </MudButton>
+        </MudCardActions>
+    </MudCard>
+</MudContainer>
+
+@code {
+    private string correoUsuario = "Cargando...";
+    private string rolUsuario = "Cargando...";
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Pedimos el estado actual al proveedor que conectamos hace un rato
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var usuarioAutenticado = authState.User;
+
+        if (usuarioAutenticado.Identity is not null && usuarioAutenticado.Identity.IsAuthenticated)
+        {
+            // Extraemos los datos directamente del Token JWT desencriptado
+            correoUsuario = usuarioAutenticado.FindFirst(c => c.Type == ClaimTypes.Email)?.Value ?? "No especificado";
+            
+            // Si configuraste el rol en tu GenerarTokenJWT, lo leemos acá
+            rolUsuario = usuarioAutenticado.FindFirst(c => c.Type == ClaimTypes.Role)?.Value ?? "Sin rol";
+        }
+    }
+
+    private async Task CerrarSesion()
+    {
+        // Transformamos al proveedor personalizado y ejecutamos tu método de limpieza
+        var customProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
+        await customProvider.MarcarUsuarioComoDesconectado();
+        
+        // Lo mandamos de vuelta a la pantalla de ingreso
+        Navigation.NavigateTo("/login");
+    }
+}

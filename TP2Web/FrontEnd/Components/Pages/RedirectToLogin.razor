@@ -1,0 +1,17 @@
+﻿@inject NavigationManager Navigation
+
+<div class="d-flex align-center gap-4 pa-4">
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Small" />
+    <MudText>Verificando sesión...</MudText>
+</div>
+
+@code {
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Solo redirige si después de conectar el cliente seguimos sin estar autenticados
+            Navigation.NavigateTo("/");
+        }
+    }
+}

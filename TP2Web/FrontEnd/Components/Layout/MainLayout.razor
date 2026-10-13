@@ -1,4 +1,8 @@
 ﻿@inherits LayoutComponentBase
+@using TP2Web.FrontEnd.Providers
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthStateProvider
+
 
 <div class="page">
     <div class="sidebar">
@@ -22,7 +26,15 @@
     <span class="dismiss">🗙</span>
 </div>
 
-<MudThemeProvider />
-<MudPopoverProvider />
-<MudDialogProvider />
-<MudSnackbarProvider />
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var customProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
+            await customProvider.InicializarEstadoInteractividadAsync();
+        }
+    }
+}
+
+<MudProviders />

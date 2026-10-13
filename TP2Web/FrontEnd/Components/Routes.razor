@@ -1,16 +1,22 @@
 ﻿@using TP2Web.FrontEnd.Components.Layout
+@using Microsoft.AspNetCore.Components.Authorization
+@using TP2Web.FrontEnd.Components.Pages
 
-
-<Router AppAssembly="@typeof(App).Assembly">
+<Router AppAssembly="typeof(Program).Assembly">
     <Found Context="routeData">
-        <ManejadorErroresGlobal>
-            <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
-            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-        </ManejadorErroresGlobal>
+        <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)">
+            <Authorizing>
+                <p>Cargando sesión...</p>
+            </Authorizing>
+            <NotAuthorized>
+                <RedirectToLogin />
+            </NotAuthorized>
+        </AuthorizeRouteView>
+        <FocusOnNavigate RouteData="routeData" Selector="h1" />
     </Found>
     <NotFound>
         <PageTitle>No encontrado</PageTitle>
-        <LayoutView Layout="@typeof(MainLayout)">
+        <LayoutView Layout="typeof(MainLayout)">
             <p role="alert">Lo sentimos, no hay nada en esta dirección.</p>
         </LayoutView>
     </NotFound>

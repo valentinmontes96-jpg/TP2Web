@@ -1,0 +1,133 @@
+﻿@page "/registro"
+@inject NavigationManager Navigation
+
+<MudGrid Spacing="0" Style="min-height: 100vh;">
+    @* Columna Izquierda: Imagen *@
+    <MudItem xs="0" sm="5" md="6" Class="d-none d-sm-flex" 
+             Style="background-image: url('https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=80&w=2000&auto=format&fit=crop'); background-size: cover; background-position: center;">
+    </MudItem>
+
+    @* Columna Derecha: Formulario *@
+    <MudItem xs="12" sm="7" md="6" Class="d-flex align-center justify-center pa-8" Style="background-color: var(--mud-palette-background);">
+        <MudContainer MaxWidth="MaxWidth.Small">
+            <div class="text-center mb-6">
+                <MudText Typo="Typo.h4" Style="font-weight: bold;">Crear Cuenta</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">Completá tus datos para registrarte</MudText>
+            </div>
+
+            @if (!string.IsNullOrEmpty(mensajeError))
+            {
+                <MudAlert Severity="Severity.Error" Class="mb-4">@mensajeError</MudAlert>
+            }
+
+            <MudForm @ref="formRegistro" @bind-IsValid="formularioValido">
+                <MudGrid Spacing="2">
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="registroModel.Nombre" Label="Nombre" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="registroModel.Apellido" Label="Apellido" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" />
+                    </MudItem>
+                </MudGrid>
+
+                <MudTextField @bind-Value="registroModel.Telefono" Label="Teléfono (WhatsApp)" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" Class="mt-4" />
+                <MudTextField @bind-Value="registroModel.Email" Label="Correo Electrónico" InputType="InputType.Email" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" Class="mt-4" />
+                
+                <MudGrid Spacing="2" Class="mt-2">
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="registroModel.Password" Label="Contraseña" InputType="InputType.Password" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="repetirPassword" Label="Confirmar Clave" InputType="InputType.Password" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true"
+                                      Validation="@(new Func<string, string>(ValidarPasswords))" />
+                    </MudItem>
+                </MudGrid>
+
+                @* Sección de Staff Clínica *@
+                <MudPaper Elevation="0" Class="pa-4 mt-6" Style="background-color: rgba(0,0,0,0.02); border: 1px solid var(--mud-palette-lines-default); border-radius: 8px;">
+                    <MudSwitch @bind-Value="esStaff" Color="Color.Primary" Label="Soy personal de la clínica" />
+                    
+                    <MudCollapse Expanded="esStaff">
+                        <MudTextField @bind-Value="registroModel.CodigoAutorizacion" 
+                                      Label="Código Secreto de Autorización" 
+                                      Variant="Variant.Outlined" 
+                                      Margin="Margin.Dense" 
+                                      HelperText="Requerido para cuentas de administrador"
+                                      Class="mt-4" />
+                    </MudCollapse>
+                </MudPaper>
+
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" FullWidth="true" Disabled="@(!formularioValido || cargando)" OnClick="EjecutarRegistro" Class="mt-6">
+                    @if (cargando)
+                    {
+                        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                    }
+                    else
+                    {
+                        <MudText>REGISTRARME</MudText>
+                    }
+                </MudButton>
+
+                <div class="text-center mt-6">
+                    <MudText Typo="Typo.body2">
+                        ¿Ya tenés una cuenta? <MudLink Href="/login" Color="Color.Primary" Underline="Underline.Always">Iniciá sesión</MudLink>
+                    </MudText>
+                </div>
+            </MudForm>
+        </MudContainer>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private MudForm formRegistro;
+    private bool formularioValido;
+    private bool cargando;
+    private string mensajeError;
+    private bool esStaff;
+    private string repetirPassword;
+
+    private RegistroDTO registroModel = new();
+
+    private string ValidarPasswords(string arg)
+    {
+        if (arg != registroModel.Password)
+            return "Las contraseñas no coinciden";
+        return null;
+    }
+
+    private async Task EjecutarRegistro()
+    {
+        await formRegistro.Validate();
+        if (formRegistro.IsValid)
+        {
+            // Si encendió el switch pero no puso el código
+            if (esStaff && string.IsNullOrWhiteSpace(registroModel.CodigoAutorizacion))
+            {
+                mensajeError = "Debes ingresar el código de autorización para registrarte como staff.";
+                return;
+            }
+
+            cargando = true;
+            mensajeError = null;
+
+            // TODO: Acá llamar a tu AuthService para registrar. 
+            // El backend evaluará si registroModel.CodigoAutorizacion coincide con tu clave secreta
+            // await AuthService.Registro(registroModel);
+            
+            await Task.Delay(1000); 
+            Navigation.NavigateTo("/login");
+            
+            cargando = false;
+        }
+    }
+
+    public class RegistroDTO
+    {
+        public string Nombre { get; set; }
+        public string Apellido { get; set; }
+        public string Telefono { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public string CodigoAutorizacion { get; set; } 
+    }
+}

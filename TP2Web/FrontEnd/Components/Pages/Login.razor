@@ -1,0 +1,129 @@
+﻿@page "/"
+@rendermode InteractiveServer
+@using TP2Web.FrontEnd.DTO.Auth.Request
+@using TP2Web.FrontEnd.Services
+@using TP2Web.FrontEnd.Providers
+@using Microsoft.AspNetCore.Components.Authorization
+@inject IAuthService AuthService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+<PageTitle>Iniciar Sesión</PageTitle>
+
+    <MudGrid Spacing="0" Style="min-height: 100vh;">
+    @* Columna Izquierda: Imagen (Oculta en celulares) *@
+    <MudItem xs="0" sm="6" md="7" Class="d-none d-sm-flex" 
+             Style="background-image: url('https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?q=80&w=2070&auto=format&fit=crop'); background-size: cover; background-position: center;">
+    </MudItem>
+
+    @* Columna Derecha: Formulario *@
+    <MudItem xs="12" sm="6" md="5" Class="d-flex align-center justify-center pa-8" Style="background-color: var(--mud-palette-background);">
+        <MudContainer MaxWidth="MaxWidth.Small">
+            <div class="text-center mb-8">
+                <MudIcon Icon="@Icons.Material.Filled.Pets" Color="Color.Primary" Size="Size.Large" Class="mb-4" />
+                <MudText Typo="Typo.h4" Style="font-weight: bold;">Bienvenido</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">Ingresá a tu cuenta para continuar</MudText>
+            </div>
+
+            @if (!string.IsNullOrEmpty(mensajeError))
+            {
+                <MudAlert Severity="Severity.Error" Class="mb-4">@mensajeError</MudAlert>
+            }
+
+            <MudForm @ref="formLogin" @bind-IsValid="formularioValido">
+                <MudTextField @bind-Value="loginModel.Email" 
+                              Label="Correo Electrónico" 
+                              Variant="Variant.Outlined" 
+                              Margin="Margin.Dense" 
+                              Required="true" 
+                              RequiredError="El correo es obligatorio" 
+                              InputType="InputType.Email" 
+                              Class="mb-4" />
+
+                <MudTextField @bind-Value="loginModel.Password" 
+                              Label="Contraseña" 
+                              Variant="Variant.Outlined" 
+                              Margin="Margin.Dense" 
+                              Required="true" 
+                              RequiredError="La contraseña es obligatoria" 
+                              InputType="@tipoInputPassword"
+                              Adornment="Adornment.End"
+                              AdornmentIcon="@iconoPassword"
+                              OnAdornmentClick="AlternarVisibilidadPassword"
+                              Class="mb-6" />
+
+                <MudButton Variant="Variant.Filled" 
+                           Color="Color.Primary" 
+                           Size="Size.Large" 
+                           FullWidth="true" 
+                           Disabled="@(!formularioValido || cargando)" 
+                           OnClick="EjecutarLogin">
+                    @if (cargando)
+                    {
+                        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                        <MudText Class="ms-2">Ingresando...</MudText>
+                    }
+                    else
+                    {
+                        <MudText>INICIAR SESIÓN</MudText>
+                    }
+                </MudButton>
+
+                <div class="text-center mt-6">
+                    <MudText Typo="Typo.body2">
+                        ¿No tenés una cuenta? <MudLink Href="/registro" Color="Color.Primary" Underline="Underline.Always">Registrate acá</MudLink>
+                    </MudText>
+                </div>
+            </MudForm>
+        </MudContainer>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private MudForm formLogin;
+    private bool formularioValido;
+    private bool cargando;
+    private string mensajeError;
+
+    // Configuración del ojito de la contraseña
+    private bool mostrarPassword;
+    private InputType tipoInputPassword = InputType.Password;
+    private string iconoPassword = Icons.Material.Filled.VisibilityOff;
+
+    // Modelo de datos local
+    private LoginDTO loginModel = new();
+
+    private void AlternarVisibilidadPassword()
+    {
+        mostrarPassword = !mostrarPassword;
+        tipoInputPassword = mostrarPassword ? InputType.Text : InputType.Password;
+        iconoPassword = mostrarPassword ? Icons.Material.Filled.Visibility : Icons.Material.Filled.VisibilityOff;
+    }
+
+    private async Task EjecutarLogin()
+    {
+        await formLogin.Validate();
+        if (formLogin.IsValid)
+        {
+            cargando = true;
+            mensajeError = null;
+
+            // TODO: Acá llamar a tu AuthService. 
+            // await AuthService.Login(loginModel);
+            
+            // Simulación de carga:
+            await Task.Delay(1000); 
+            Navigation.NavigateTo("/home");
+            
+            cargando = false;
+        }
+    }
+
+    public class LoginDTO
+    {
+        public string Email { get; set; }
+        public string Password { get; set; }
+    }
+}

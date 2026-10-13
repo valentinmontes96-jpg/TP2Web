@@ -12,5 +12,6 @@ namespace TP2Web.FrontEnd.Data
         public DbSet<Mascota> Mascotas { get; set; } = null!;
         public DbSet<Cita> Citas { get; set; } = null!;
         public DbSet<Veterinario> Veterinarios { get; set; } = null!;
+        public DbSet<Usuario> Usuarios { get; set; } = null!;
     }
 }
