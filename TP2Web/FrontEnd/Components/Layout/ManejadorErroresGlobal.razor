@@ -1,0 +1,38 @@
+﻿
+@inherits ErrorBoundary
+@using TP2Web.FrontEnd.Excepciones
+
+@if (CurrentException is null)
+{
+    @ChildContent
+}
+else
+{
+    <MudContainer MaxWidth="MaxWidth.mt" Class="mt-10">
+        <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Class="mb-4">
+            @ObtenerMensajeDeError()
+        </MudAlert>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Recover">
+            Volver a intentar
+        </MudButton>
+    </MudContainer>
+}
+
+@code {
+    protected override Task OnErrorAsync(Exception exception)
+    {
+        // a futuro guardar el error en un archivo log
+        return base.OnErrorAsync(exception);
+    }
+
+    private string ObtenerMensajeDeError()
+    {
+        return CurrentException switch
+        {
+            RegistroNoEncontradoException ex => ex.Message,
+            BaseDeDatosException ex => "Ocurrió un problema interno al intentar conectar o guardar en la base de datos.",
+            ReglaNegocioException ex => ex.Message,
+            _ => "Ocurrió un error inesperado en el sistema. Por favor, intente nuevamente."
+        };
+    }
+}

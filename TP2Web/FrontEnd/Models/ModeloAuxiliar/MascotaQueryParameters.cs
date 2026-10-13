@@ -1,6 +1,6 @@
 ﻿namespace TP2Web.FrontEnd.Models.ModeloAuxiliar
 {
-    public class MascotaQueryParametros
+    public class MascotaQueryParameters
     {
         public int PaginaActual { get; set; } = 1;
         public int TamanoPagina { get; set; } = 10;

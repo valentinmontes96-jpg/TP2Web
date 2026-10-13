@@ -21,7 +21,7 @@ public class MascotaService : IMascotaService
     public async Task<PaginadoResponse<MascotaResponse>> ObtenerTodasAsync(MascotaPaginado request)
     {
         // traducir el Request del usuario a los Parámetros del Repositorio
-        var parametros = new MascotaQueryParametros
+        var parametros = new MascotaQueryParameters
         {
             PaginaActual = request.NumeroPagina,
             TamanoPagina = request.TamanoPagina,
@@ -51,6 +51,29 @@ public class MascotaService : IMascotaService
         };
     }
 
+    public async Task ActualizarAsync(MascotaActualizar request)
+    {
+        // 1. Buscamos si la mascota existe
+        var mascotaExistente = await _mascotaRepository.ObtenerPorIdAsync(request.Id);
+
+        // 2. Si no existe, lanzamos tu nueva excepción personalizada
+        if (mascotaExistente == null)
+            throw new RegistroNoEncontradoException("Mascota", request.Id);
+
+        // 3. Actualizamos los datos
+        mascotaExistente.Nombre = request.Nombre;
+        mascotaExistente.Especie = request.Especie;
+
+        // 4. Le decimos al repositorio que aplique y guarde los cambios
+        _mascotaRepository.Actualizar(mascotaExistente);
+        await _mascotaRepository.GuardarCambiosAsync();
+    }
+
+    public async Task GuardarCambiosAsync()
+    {
+        // Simplemente le pasamos la orden al repositorio
+        await _mascotaRepository.GuardarCambiosAsync();
+    }
     public async Task CrearAsync(MascotaCrear request)
     {
         var nuevaMascota = new Mascota
@@ -62,6 +85,16 @@ public class MascotaService : IMascotaService
         await _mascotaRepository.AgregarAsync(nuevaMascota);
     }
 
+    public async Task EliminarAsync(int id)
+    {
+        var mascotaExistente = await _mascotaRepository.ObtenerPorIdAsync(id);
+
+        if (mascotaExistente == null)
+            throw new RegistroNoEncontradoException("Mascota", id);
+
+        _mascotaRepository.Eliminar(mascotaExistente);
+        await _mascotaRepository.GuardarCambiosAsync();
+    }
     public async Task<MascotaResponse?> ObtenerPorIdAsync(int id)
     {
         var mascota = await _mascotaRepository.ObtenerPorIdAsync(id);

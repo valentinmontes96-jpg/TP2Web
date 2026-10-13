@@ -4,6 +4,7 @@ using TP2Web.FrontEnd.Components;
 using TP2Web.FrontEnd.Data;
 using TP2Web.FrontEnd.Implementaciones;
 using TP2Web.FrontEnd.Repositories;
+using TP2Web.FrontEnd.Services;
 
 
 
@@ -22,6 +23,16 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     ));
 
 builder.Services.AddScoped<IMascotaRepository, MascotaRepository>();
+builder.Services.AddScoped<IMascotaService, MascotaService>();
+
+builder.Services.AddScoped<ICitaRepository, CitaRepository>();
+builder.Services.AddScoped<ICitaService, CitaService>();
+
+builder.Services.AddScoped<IVeterinarioRepository, VeterinarioRepository>();
+builder.Services.AddScoped<IVeterinarioService, VeterinarioService>();
+
+builder.Services.AddScoped<ICitaRepository, CitaRepository>();
+builder.Services.AddScoped<ICitaService, CitaService>();
 
 ////////////////////////
 

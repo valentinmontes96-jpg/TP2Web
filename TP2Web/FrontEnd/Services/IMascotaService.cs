@@ -9,6 +9,7 @@ namespace TP2Web.FrontEnd.Services
         Task<PaginadoResponse<MascotaResponse>> ObtenerTodasAsync(MascotaPaginado request);
         Task<MascotaResponse?> ObtenerPorIdAsync(int id);
         Task CrearAsync(MascotaCrear request);
+        Task EliminarAsync(int id);
         Task ActualizarAsync(MascotaActualizar request);
         Task GuardarCambiosAsync();
 
