@@ -16,18 +16,16 @@ public class ClienteService : IClienteService
         _clienteRepository = clienteRepository;
     }
 
-    public async Task<IEnumerable<ClienteResponse>> ObtenerTodosAsync()
+    public async Task<IEnumerable<ClienteResponse>> ObtenerTodosAsync(ClienteQueryParameters parametros)
     {
-        //DUDA
-        var clientes = await _clienteRepository.ObtenerTodosAsync(ClienteQueryParameters);
+        var clientes = await _clienteRepository.ObtenerTodosAsync(parametros);
 
-        // Mapeamos de Modelo a DTO
         return clientes.Select(c => new ClienteResponse
         {
             Id = c.Id,
             Nombre = c.Nombre,
             Telefono = c.Telefono,
-            Email = c.Email,
+            Email = c.Email
         });
     }
 
